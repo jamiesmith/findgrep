@@ -1,0 +1,8 @@
+#!/bin/ksh
+
+FINDGREP=findgrep
+
+# findgrep with cfg
+#
+
+$FINDGREP -x cfg $*

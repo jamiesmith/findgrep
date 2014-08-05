@@ -1,0 +1,143 @@
+#!/bin/ksh
+
+# Build the list of extensions
+#
+typeset extentions=
+typeset typelist
+typeset grepargs
+typeset findargs
+typeset findLinks
+typeset ignoreExtenstion
+typeset edit=false
+typeset editor=emacs
+typeset -u findFile=FALSE
+
+function DieUsage
+{
+	print "Usage: $0 [-x ext1 -x ext2] [-ilvw] words to search for"
+	print ""
+	print "\tExample: $0 -i -x sdl -x soc interface"
+	print "\twill perform a 'grep -i' on all files below the current"
+	print "\tdirectory that end in the extension sdl or soc"
+
+	exit 1
+}
+
+function contains
+{
+    string="$1"
+    substring="$2"
+    if test "${string#*$substring}" != "$string"
+    then
+	echo "RET 0"
+        return 0    # $substring is in $string
+    else
+	echo "RET 1"
+        return 1    # $substring is not in $string
+    fi
+}
+
+if [ $# -eq 0 ]
+then
+	DieUsage
+fi
+
+while getopts "acefFgilmvwx:" option
+do
+	case $option in 
+		a)
+			findLinks="-o -type l"
+			;;
+		
+		c)
+			grepargs="$grepargs --color=auto"
+			;;
+		e)
+			edit=true
+			# Also force it to just list the files                                                                                        
+			grepargs="$grepargs -l"
+			;;
+		f)
+			findFile=TRUE
+			;;
+		g)
+			ignoreExtentions="$ignoreExtentions $OPTARG"
+			;;
+		m)
+			edit=true
+			# Also force it to just list the files                                                                                        
+			grepargs="$grepargs -l"
+			editor=mate
+			;;
+		
+		i|l|v|w)
+			grepargs="$grepargs -${option}"
+			;;
+		
+		x)
+			extentions="$extentions $OPTARG"
+	esac
+done
+
+shift $((${OPTIND} - 1)) 
+
+for extension in $extentions
+do
+	if [ -n "$typelist" ]
+	then
+		typelist="$typelist -o "
+	fi
+	
+	if [ "$findFile" = "TRUE" ]
+	then
+		typelist="${typelist}-name \"${extension}\""
+	else
+		typelist="${typelist}-name \"*.${extension}\""
+	fi
+done
+
+for extension in $ignoreExtentions
+do
+	if [ -n "$ignoreList" ]
+	then
+		ignoreList="$ignoreList -o "
+	fi	
+	ignoreList="${ignoreList}-name \"*.${extension}\""
+done
+
+findargs="\( -type f $findLinks \)"
+
+if [ -n "$typelist" ]
+then
+	findargs="$findargs -a \( $typelist \)"
+fi
+
+# Don't want to expand the *'s, in case there are matching file names in this
+# dir
+#
+
+set -o noglob
+
+function doFind
+{
+	find  . -name CVS -prune \
+		-or -name .svn -prune \
+		-or -name .idea -prune \
+		-or -name .metadata -prune \
+		-or -path '*/*.class' -prune  \
+		-or -path '*/_*.java' -prune  \
+		-or -name 'ossm' -prune \
+		-or $(eval echo $findargs)  \
+		-exec grep -H $grepargs "$*" "{}" \;
+}
+
+if [ $edit = "true" ]
+then
+	$editor $(doFind "$*")
+else
+	doFind $*
+fi
+
+
+exit 0
+
