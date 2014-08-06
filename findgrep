@@ -7,10 +7,11 @@ typeset typelist
 typeset grepargs
 typeset findargs
 typeset findLinks
-typeset ignoreExtenstion
+typeset fileFilters
+typeset ignoreExtension
 typeset edit=false
 typeset editor=emacs
-typeset -u findFile=FALSE
+typeset ECHO=""
 
 function DieUsage
 {
@@ -42,7 +43,7 @@ then
 	DieUsage
 fi
 
-while getopts "acefFgilmvwx:" option
+while getopts "acef:Fgilmnvwx:" option
 do
 	case $option in 
 		a)
@@ -58,16 +59,22 @@ do
 			grepargs="$grepargs -l"
 			;;
 		f)
-			findFile=TRUE
+			fileFilters="$fileFilters $OPTARG"
+
 			;;
 		g)
-			ignoreExtentions="$ignoreExtentions $OPTARG"
+			ignoreExtensions="$ignoreExtensions $OPTARG"
 			;;
 		m)
 			edit=true
 			# Also force it to just list the files                                                                                        
 			grepargs="$grepargs -l"
 			editor=mate
+			;;
+		n)
+			# No-Op
+			#
+			ECHO=echo
 			;;
 		
 		i|l|v|w)
@@ -88,15 +95,20 @@ do
 		typelist="$typelist -o "
 	fi
 	
-	if [ "$findFile" = "TRUE" ]
-	then
-		typelist="${typelist}-name \"${extension}\""
-	else
-		typelist="${typelist}-name \"*.${extension}\""
-	fi
+	typelist="${typelist}-name \"*.${extension}\""
 done
 
-for extension in $ignoreExtentions
+for fileFilter in $fileFilters
+do
+	if [ -n "$typelist" ]
+	then
+		typelist="$typelist -o "
+	fi
+	
+	typelist="${typelist}-name \"${fileFilter}\""
+done
+
+for extension in $ignoreExtensions
 do
 	if [ -n "$ignoreList" ]
 	then
@@ -115,12 +127,11 @@ fi
 # Don't want to expand the *'s, in case there are matching file names in this
 # dir
 #
-
 set -o noglob
 
 function doFind
 {
-	find  . -name CVS -prune \
+	${ECHO} find  . -name CVS -prune \
 		-or -name .svn -prune \
 		-or -name .idea -prune \
 		-or -name .metadata -prune \
