@@ -1,0 +1,8 @@
+#!/bin/ksh
+
+FINDGREP=findgrep
+
+# findgrep with just poms
+#
+
+$FINDGREP -f pom.xml $*
