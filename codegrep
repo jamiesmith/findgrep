@@ -2,7 +2,7 @@
 
 FINDGREP=findgrep
 
-# findgrep with soc/act/sdl/kpm
+# findgrep with soc/act/sdl/kpm/java/cpp
 #
 
 $FINDGREP -x soc -x act -x sdl -x kpm -x cpp -x java $*
