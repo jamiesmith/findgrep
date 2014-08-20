@@ -10,6 +10,7 @@ typeset findLinks
 typeset edit=false
 typeset editor=emacs
 typeset canedit=true
+typeset listLong=false
 
 function DieUsage
 {
@@ -44,6 +45,7 @@ do
 			if [ $option = "l" ]
 			then
 				canedit=true
+				listLong=true
 			fi
 
 			grepargs="$grepargs -${option}"
@@ -106,6 +108,10 @@ function doFindOld
 if [ $edit = "true" -a $canedit = "true" ]
 then
 	$editor $(doFind "$*")
+elif [ "$listLong" = "true" ]
+then
+
+	/bin/ls -lF $(doFind "$*")
 else
 	doFind $* 
 fi
