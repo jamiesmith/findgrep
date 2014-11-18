@@ -133,6 +133,7 @@ function doFind
 {
 	${ECHO} find  . -name CVS -prune \
 		-or -name .svn -prune \
+		-or -name .git -prune \
 		-or -name .idea -prune \
 		-or -name .metadata -prune \
 		-or -path '*/*.class' -prune  \
