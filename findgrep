@@ -2,23 +2,22 @@
 
 # Build the list of extensions
 #
-typeset extentions=
-typeset typelist
+typeset extentions=""
+typeset limitExtensionsArg=""
 typeset grepargs
 typeset findargs
 typeset findLinks
-typeset fileFilters
 typeset edit=false
 typeset editor=emacs
 typeset ECHO=""
 
 function DieUsage
 {
-	print "Usage: $0 [-x ext1] [-ilvw] words to search for"
+	print "Usage: $0 [-x ext1] [-x ext2] [-ilvw] words to search for"
 	print ""
-	print "\tExample: $0 -i -x java interface"
-	print "\twill perform an 'ag --java' on all files below the current"
-	print "\tdirectory that end in the java file types"
+	print "\tExample: $0 -i -x erb -x rhtml interface"
+	print "\twill perform an 'ag ' on all files below the current"
+	print "\tdirectory that end in either .erb or .rhtml"
 	print "$*"
 
 	exit 1
@@ -29,7 +28,7 @@ then
 	DieUsage
 fi
 
-while getopts "acef:Fgilmnvwx:" option
+while getopts "aceFghilmnvwx:" option
 do
 	case $option in 
 		a)
@@ -41,21 +40,24 @@ do
 			;;
 		e)
 			edit=true
-			# Also force it to just list the files                                                                                        
+			
+			# Also force it to just list the files
+			#            
 			grepargs="$grepargs -l"
 			;;
-		f)
-			fileFilters="$fileFilters $OPTARG"
+		h)
+			DieUsage
 			;;
 		m)
 			edit=true
-			
-			# Also force it to just list the files                                  
-			grepargs="$grepargs -l"
 			editor=mate
+			
+			# Also force it to just list the files
+			#
+			grepargs="$grepargs -l"
 			;;
 		n)
-			# No-Op
+			# No-Op, just display the command
 			#
 			ECHO=echo
 			;;
@@ -67,56 +69,25 @@ do
 		x)
 			if [ -n "$extentions" ]
 			then
-				foo="$(ag --list-file-types)"
-				DieUsage "Only one extension category is allowed: $foo"
-				
+				extentions="$extentions|"
 			fi
-			extentions="$extentions $OPTARG"
+			extentions="$extentions$OPTARG"
 	esac
 done
 
 shift $((${OPTIND} - 1)) 
 
-for extension in $extentions
-do
-	typelist="${typelist} --${extension}"
-done
-
-for fileFilter in $fileFilters
-do
-	if [ -n "$typelist" ]
-	then
-		typelist="$typelist -o "
-	fi
-	
-	typelist="${typelist}-name \"${fileFilter}\""
-done
-
 findargs="$findLinks"
 
-if [ -n "$typelist" ]
+if [ -n "$extentions" ]
 then
-	findargs="$findargs $typelist"
+	findargs="$findargs -G .+\\.($extentions)$"
 fi
 
 # Don't want to expand the *'s, in case there are matching file names in this
 # dir
 #
 set -o noglob
-
-function doFindOld
-{
-	${ECHO} find  . -name CVS -prune \
-		-or -name .svn -prune \
-		-or -name .git -prune \
-		-or -name .idea -prune \
-		-or -name .metadata -prune \
-		-or -path '*/*.class' -prune  \
-		-or -path '*/_*.java' -prune  \
-		-or -name 'ossm' -prune \
-		-or $(eval echo $findargs)  \
-		-exec grep -H $grepargs "$*" "{}" \;
-}
 
 function doFind
 {
