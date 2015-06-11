@@ -28,6 +28,14 @@ then
 	DieUsage
 fi
 
+# This requires ag, so if it isn't found there is a problem
+#
+which ag > /dev/null
+if [ $? -ne 0 ]
+then
+	DieUsage "\nError, ag not found, install it via:\n\tbrew install ag"
+fi
+
 while getopts "aceFghilmnvwx:" option
 do
 	case $option in 
