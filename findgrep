@@ -100,8 +100,6 @@ set -o noglob
 
 function doFind
 {
-    echo grepargs $grepargs
-    echo agFlags $agFlags
 	${ECHO} ag $agFlags $grepargs "$*"
 }
 
