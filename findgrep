@@ -5,11 +5,11 @@
 typeset extentions=""
 typeset limitExtensionsArg=""
 typeset grepargs
-typeset findargs
-typeset findLinks
+typeset agFlags
 typeset edit=false
 typeset editor=emacs
 typeset ECHO=""
+typeset fuzzy=0
 
 function DieUsage
 {
@@ -36,11 +36,11 @@ then
 	DieUsage "\nError, ag not found, install it via:\n\tbrew install ag"
 fi
 
-while getopts "aceFghilmnvwx:" option
+while getopts "acef:ghilmnvwx:" option
 do
 	case $option in 
 		a)
-			findLinks="-f"
+			agFlags="$agFlags --follow"
 			;;
 		
 		c)
@@ -52,6 +52,9 @@ do
 			# Also force it to just list the files
 			#            
 			grepargs="$grepargs -l"
+			;;
+		f)
+			agFlags="$agFlags -B $OPTARG -A $OPTARG" 
 			;;
 		h)
 			DieUsage
@@ -85,11 +88,9 @@ done
 
 shift $((${OPTIND} - 1)) 
 
-findargs="$findLinks"
-
 if [ -n "$extentions" ]
 then
-	findargs="$findargs -G .+\\.($extentions)$"
+    agFlags="-G .+\\.($extentions)$ $agFlags"
 fi
 
 # Don't want to expand the *'s, in case there are matching file names in this
@@ -99,7 +100,9 @@ set -o noglob
 
 function doFind
 {
-	${ECHO} ag $findargs $grepargs "$*"
+    echo grepargs $grepargs
+    echo agFlags $agFlags
+	${ECHO} ag $agFlags $grepargs "$*"
 }
 
 if [ $edit = "true" ]
