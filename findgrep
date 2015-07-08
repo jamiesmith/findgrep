@@ -7,7 +7,7 @@ typeset limitExtensionsArg=""
 typeset grepargs
 typeset agFlags
 typeset edit=false
-typeset editor=emacs
+typeset editor=emacsclient
 typeset ECHO=""
 typeset fuzzy=0
 
@@ -100,12 +100,15 @@ set -o noglob
 
 function doFind
 {
-	${ECHO} ag $agFlags $grepargs "$*"
+	${ECHO} ag $agFlags $grepargs "$*" 
 }
 
 if [ $edit = "true" ]
 then
-	$editor $(doFind "$*")
+	# This still doesn't like file names with spaces in it.
+	#
+	# $editor $(doFind "$*" | sed 's/.*/"&"/' | xargs $eitor)
+	doFind "$*" | sed 's/.*/"&"/' | xargs $editor
 else
 	doFind $*
 fi
