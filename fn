@@ -52,20 +52,21 @@ do
 			;;
 		
 		x)
-			extentions="$extentions $OPTARG"
+			extentions="$extentions .$OPTARG$"
 	esac
 done
 
 shift $((${OPTIND} - 1)) 
 
-extentions="$*"
+extentions="$extentions $*"
 
-for pattern in $extentions
+for pattern in $extentions 
 do
 	if [ -n "$typelist" ]
 	then
 		typelist="$typelist -o "
-	fi	
+	fi
+
 	typelist="${typelist}-name \"*${pattern}*\""
 done
 
@@ -79,30 +80,14 @@ fi
 # Don't want to expand the *'s, in case there are matching file names in this
 # dir
 #
-
 set -o noglob
-
-# Trying this to see if we can handle filenames with spaces
-#
-# JRS-TMP find . -path '*/CVS*' -prune -or $(eval echo $findargs) -print0| \
-# JRS-TMP 	xargs -0 -n1 grep $grepargs "$*" /dev/null
 
 function doFind
 {
-# JRS-TMP 	echo find . -path 'CVS' -prune \
-# JRS-TMP 		-or -path '.svn' -prune \
-# JRS-TMP 		-or -path 'ossm' -prune \
-# JRS-TMP 		-or $(eval echo $findargs) 
-
 	find . -path 'CVS' -prune \
 		-or -path '.svn' -prune \
 		-or -path 'ossm' -prune \
 		-or $(eval echo $findargs) |egrep -v "/CVS/|/.svn/|.class$"
-}
-
-function doFindOld
-{
-    find . $(eval echo $findargs) | grep -v ~$
 }
 
 if [ $edit = "true" -a $canedit = "true" ]
