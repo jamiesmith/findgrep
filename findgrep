@@ -100,7 +100,7 @@ set -o noglob
 
 function doFind
 {
-	${ECHO} ag $agFlags $grepargs "$*" 
+	${ECHO} ag --skip-vcs-ignores $agFlags $grepargs "$*" 
 }
 
 if [ $edit = "true" ]
