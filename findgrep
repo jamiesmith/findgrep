@@ -10,6 +10,7 @@ typeset edit=false
 typeset editor=emacs
 typeset ECHO=""
 typeset fuzzy=0
+typeset caseFlag="--case-sensitive"
 
 function DieUsage
 {
@@ -56,6 +57,9 @@ do
 		f)
 			agFlags="$agFlags -B $OPTARG -A $OPTARG" 
 			;;
+		i)
+			caseFlag="--ignore-case"
+			;;
 		h)
 			DieUsage
 			;;
@@ -100,7 +104,7 @@ set -o noglob
 
 function doFind
 {
-	${ECHO} ag --skip-vcs-ignores $agFlags $grepargs "$*" 
+	${ECHO} ag $caseFlag --skip-vcs-ignores $agFlags $grepargs "$*" 
 }
 
 if [ $edit = "true" ]
