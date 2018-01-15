@@ -1,9 +1,0 @@
-#!/bin/ksh
-
-FINDGREP=findgrep
-
-# findgrep with soc/act/sdl/kpm
-#
-
-$FINDGREP -x rule -x rulefunction -x java $*
-

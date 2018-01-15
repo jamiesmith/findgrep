@@ -2,7 +2,4 @@
 
 FINDGREP=findgrep
 
-# findgrep with soc/act/sdl/kpm/java/cpp
-#
-
 $FINDGREP -x rb -x html -x erb -x rhtml $*

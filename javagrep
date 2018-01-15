@@ -2,7 +2,4 @@
 
 FINDGREP=findgrep
 
-# findgrep with soc/act/sdl/kpm
-#
-
 $FINDGREP  -x java $*

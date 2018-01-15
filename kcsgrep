@@ -1,9 +1,0 @@
-#!/bin/ksh
-
-FINDGREP=findgrep
-
-# findgrep with xml/kcs
-#
-
-$FINDGREP -x xml -x kcs $*
-
