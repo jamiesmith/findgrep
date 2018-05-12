@@ -2,7 +2,7 @@
 
 # Build the list of extensions
 #
-typeset extentions=""
+typeset extensions=""
 typeset limitExtensionsArg=""
 typeset grepargs
 typeset agFlags
@@ -40,7 +40,7 @@ fi
 while getopts "acef:ghilmnvwx:" option
 do
 	case $option in 
-		a)
+    a)
 			agFlags="$agFlags --follow"
 			;;
 		
@@ -82,19 +82,19 @@ do
 			;;
 		
 		x)
-			if [ -n "$extentions" ]
+			if [ -n "$extensions" ]
 			then
-				extentions="$extentions|"
+				extensions="$extensions|"
 			fi
-			extentions="$extentions$OPTARG"
+			extensions="$extensions$OPTARG"
 	esac
 done
 
 shift $((${OPTIND} - 1)) 
 
-if [ -n "$extentions" ]
+if [ -n "$extensions" ]
 then
-    agFlags="-G .+\\.($extentions)$ $agFlags"
+    agFlags="-G .+\\.($extensions)$ $agFlags"
 fi
 
 # Don't want to expand the *'s, in case there are matching file names in this
@@ -104,7 +104,7 @@ set -o noglob
 
 function doFind
 {
-	${ECHO} ag $caseFlag --skip-vcs-ignores $agFlags $grepargs "$*" 
+	${ECHO} ag $caseFlag --skip-vcs-ignores --ignore _site $agFlags $grepargs "$*" 
 }
 
 if [ $edit = "true" ]
