@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 
 # Build the list of extensions
 #
