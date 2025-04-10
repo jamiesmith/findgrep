@@ -2,9 +2,10 @@
 
 # Build the list of patterns
 #
-while getopts "aefilvwx:" option
+while getopts "aefilLvwx:" option
 do
-	flags="$flags $OPTARG"
+    echo $OPTARG
+	flags="$flags -${option} $OPTARG"
 done
 
 shift $((${OPTIND} - 1)) 
@@ -16,7 +17,7 @@ do
 	typelist="$typelist -x $ext"
 done
 
-echo fn $(eval echo $flags $typelist)
+#echo fn $(eval echo $flags $typelist)
 fn $flags $typelist
 
 exit 0

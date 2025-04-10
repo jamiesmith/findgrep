@@ -14,12 +14,12 @@ typeset caseFlag="--case-sensitive"
 
 function DieUsage
 {
-	print "Usage: $0 [-x ext1] [-x ext2] [-ilvw] words to search for"
-	print ""
-	print "\tExample: $0 -i -x erb -x rhtml interface"
-	print "\twill perform an 'ag ' on all files below the current"
-	print "\tdirectory that end in either .erb or .rhtml"
-	print "$*"
+	printf "Usage: $0 [-x ext1] [-x ext2] [-ilvw] words to search for"
+	printf ""
+	printf "\tExample: $0 -i -x erb -x rhtml interface"
+	printf "\twill perform an 'ag ' on all files below the current"
+	printf "\tdirectory that end in either .erb or .rhtml"
+	printf "$*"
 
 	exit 1
 }
@@ -37,57 +37,62 @@ then
 	DieUsage "\nError, ag not found, install it via:\n\tbrew install ag"
 fi
 
-while getopts "acef:ghilmnvwx:" option
+while getopts "acef:ghilmnqvwx:" option
 do
-	case $option in 
-    a)
-			agFlags="$agFlags --follow"
-			;;
-		
-		c)
-			grepargs="$grepargs --color"
-			;;
-		e)
-			edit=true
-			
-			# Also force it to just list the files
-			#            
-			grepargs="$grepargs -l"
-			;;
-		f)
-			agFlags="$agFlags -B $OPTARG -A $OPTARG" 
-			;;
-		i)
-			caseFlag="--ignore-case"
-			;;
-		h)
-			DieUsage
-			;;
-		m)
-			edit=true
-			editor=mate
-			
-			# Also force it to just list the files
-			#
-			grepargs="$grepargs -l"
-			;;
-		n)
-			# No-Op, just display the command
-			#
-			ECHO=echo
-			;;
-		
-		i|l|v|w)
-			grepargs="$grepargs -${option}"
-			;;
-		
-		x)
-			if [ -n "$extensions" ]
-			then
-				extensions="$extensions|"
-			fi
-			extensions="$extensions$OPTARG"
-	esac
+    case $option in 
+        a)
+            agFlags="$agFlags --follow"
+	    ;;
+	
+	c)
+	    grepargs="$grepargs --color"
+	    ;;
+	e)
+	    edit=true
+	    
+	    # Also force it to just list the files
+	    #            
+	    grepargs="$grepargs -l"
+	    ;;
+	f)
+	    agFlags="$agFlags -B $OPTARG -A $OPTARG" 
+	    ;;
+	i)
+	    caseFlag="--ignore-case"
+	    ;;
+	h)
+	    DieUsage
+	    ;;
+	m)
+	    edit=true
+	    editor=mate
+	    
+	    # Also force it to just list the files
+	    #
+	    grepargs="$grepargs -l"
+	    ;;
+	n)
+	    # No-Op, just display the command
+	    #
+	    ECHO=echo
+	    ;;
+	q)
+	    # Quiet mode - no file names
+	    #
+	    quietFlag="--nofilename"
+	    ;;
+	
+	i|l|v|w)
+	    grepargs="$grepargs -${option}"
+	    ;;
+	
+	x)
+	    if [ -n "$extensions" ]
+	    then
+		extensions="$extensions|"
+	    fi
+	    extensions="$extensions$OPTARG"
+    esac
 done
 
 shift $((${OPTIND} - 1)) 
@@ -104,7 +109,7 @@ set -o noglob
 
 function doFind
 {
-	${ECHO} ag $caseFlag --skip-vcs-ignores --ignore _site $agFlags $grepargs "$*" 
+	${ECHO} ag $quietFlag $caseFlag --skip-vcs-ignores --ignore _site $agFlags $grepargs "$*" 
 }
 
 if [ $edit = "true" ]

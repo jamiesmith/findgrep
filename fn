@@ -11,6 +11,7 @@ typeset edit=false
 typeset editor=emacs
 typeset canedit=true
 typeset listLong=false
+typeset followLinks=""
 
 function DieUsage
 {
@@ -19,6 +20,7 @@ function DieUsage
 	print "\tExample: $0 -i -x sdl -x soc interface"
 	print "\twill perform a 'grep -i' on all files below the current"
 	print "\tdirectory that end in the pattern sdl or soc"
+    print "\tYou can add a -L to follow links"
 
 	exit 1
 }
@@ -28,7 +30,7 @@ then
 	DieUsage
 fi
 
-while getopts "aefilmvwx:" option
+while getopts "aefilLmvwx:" option
 do
 	case $option in 
 		a)
@@ -36,10 +38,6 @@ do
 			;;
 		e)
 			edit=true
-			;;
-		m)
-			edit=true
-			editor=mate
 			;;
 		i|l|v|w)
 			if [ $option = "l" ]
@@ -51,6 +49,13 @@ do
 			grepargs="$grepargs -${option}"
 			;;
 		
+		L)
+			followLinks="-L"
+			;;
+		m)
+			edit=true
+			editor=mate
+			;;
 		x)
 			extentions="$extentions .$OPTARG$"
 	esac
@@ -84,7 +89,7 @@ set -o noglob
 
 function doFind
 {
-	find . -path 'CVS' -prune \
+	find ${followLinks} . -path 'CVS' -prune \
 		-or -path '.svn' -prune \
 		-or -path 'ossm' -prune \
 		-or $(eval echo $findargs) |egrep -v "/CVS/|/.svn/|.class$"
